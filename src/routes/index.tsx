@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
     { name: "description", content: "Saisie jury et classement automatique d'une compétition de robotique." },
     { property: "og:title", content: "Fiche d'évaluation – Compétition Robotique" },
     { property: "og:description", content: "Saisie jury et classement automatique." },
-    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+    { property: "og:type", content: "website" }, { property: "og:locale", content: "fr_FR" }, { name: "twitter:card", content: "summary" },
   ] }),
   component: Index,
 });
