@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
-import { Bot, MessageSquare, Timer, User, Users } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { SignaturePad, type SignaturePadHandle } from "@/components/SignaturePad";
+import { Bot, Eraser, MessageSquare, Timer, User, Users } from "lucide-react";
 import { bestTimeOf, finalTimeOf, normalizeTime, rank, type Team } from "@/lib/scoring";
 
 export const Route = createFileRoute("/")({
@@ -33,15 +34,18 @@ function Index() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [step, setStep] = useState(1);
   const [f, setF] = useState(empty);
+  const pad = useRef<SignaturePadHandle>(null);
+  const [sigEmpty, setSigEmpty] = useState(true);
   useEffect(() => { try { setTeams(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch {} }, []);
   const save = (t: Team[]) => { setTeams(t); localStorage.setItem(KEY, JSON.stringify(t)); };
   const set = (k: keyof typeof empty) => (e: any) => setF({ ...f, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
 
   const submit = () => {
+    if (!pad.current || pad.current.isEmpty()) return;
     const times = [f.t1, f.t2, f.t3];
     const bestTime = bestTimeOf(times);
     save([...teams, { id: crypto.randomUUID(), teamName: f.teamName, teamLeader: f.teamLeader, robotCode: f.robotCode,
-      times: times.map(normalizeTime), bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks }]);
+      times: times.map(normalizeTime), bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks, signature: pad.current?.toDataURL() }]);
     setF(empty); setStep(1);
   };
   const sorted = rank(teams);
@@ -54,12 +58,12 @@ function Index() {
   };
   const reset = () => { if (confirm("Vider tout le classement ?")) { localStorage.removeItem(KEY); setTeams([]); } };
 
-  const steps = ["Infos", "Temps", "Pénalité"];
+  const steps = ["Infos", "Temps", "Pénalité", "Signature"];
   return (
     <main className="mx-auto max-w-6xl space-y-4 p-4 pb-10 lg:grid lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:items-start lg:gap-6 lg:space-y-0 lg:p-8">
       <h1 className="text-xl font-bold leading-tight lg:col-span-2 lg:text-2xl">🤖 Fiche d'évaluation<span className="block text-sm font-normal text-muted-foreground">Compétition Robotique</span></h1>
       <section className="rounded-xl border bg-card p-4 shadow-sm lg:sticky lg:top-6">
-        <ol className="mb-4 grid grid-cols-3 gap-2">
+        <ol className="mb-4 grid grid-cols-4 gap-2">
           {steps.map((s, i) => (
             <li key={s} className="text-center text-xs">
               <div className={`mb-1 h-1.5 rounded-full ${step > i ? "bg-primary" : "bg-muted"}`} />
@@ -85,7 +89,14 @@ function Index() {
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Best</p><p className="font-semibold">{bestTimeOf([f.t1,f.t2,f.t3]).toFixed(2)}s</p></div>
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Final</p><p className="font-semibold">{finalTimeOf(bestTimeOf([f.t1,f.t2,f.t3]), f.penalty).toFixed(2)}s</p></div>
           </div>
-          <div className="flex gap-2"><button className={btn2} onClick={() => setStep(2)}>Retour</button><button className={btn} onClick={submit}>Enregistrer</button></div>
+          <div className="flex gap-2"><button className={btn2} onClick={() => setStep(2)}>Retour</button><button className={btn} onClick={() => setStep(4)}>Suivant</button></div>
+        </div>}
+        {step === 4 && <div className="space-y-3">
+          <h3 className="text-base font-semibold">Validation du participant</h3>
+          <p className="text-xs text-muted-foreground">Signature de {f.teamLeader || "chef d'équipe"} ({f.teamName})</p>
+          <SignaturePad ref={pad} onChange={setSigEmpty} />
+          <button className={`${btn2} flex w-full items-center justify-center gap-2`} onClick={() => pad.current?.clear()}><Eraser size={18} /> Effacer</button>
+          <div className="flex gap-2"><button className={btn2} onClick={() => setStep(3)}>Retour</button><button className={btn} disabled={sigEmpty} onClick={submit}>Valider et Enregistrer</button></div>
         </div>}
       </section>
       <section className="rounded-xl border bg-card p-4 shadow-sm">
@@ -114,10 +125,11 @@ function Index() {
                 {i < 8 && <span className="font-semibold text-primary">✓ Top 8</span>}
               </div>
               {t.remarks && <p className="mt-1 text-xs italic text-muted-foreground">{t.remarks}</p>}
+              {t.signature && <img src={t.signature} alt={`Signature ${t.teamName}`} className="mt-2 h-10 rounded border bg-card" />}
             </li>))}
         </ul>
         <div className="hidden overflow-x-auto md:block"><table className="w-full text-sm">
-          <thead><tr className="border-b text-left">{["Rank","Team Name","Robot Code","Best Time","Penalty","Final Time","Top 8","Remarks"].map((h) => <th key={h} className="p-2">{h}</th>)}</tr></thead>
+          <thead><tr className="border-b text-left">{["Rank","Team Name","Robot Code","Best Time","Penalty","Final Time","Top 8","Remarks","Signature"].map((h) => <th key={h} className="p-2">{h}</th>)}</tr></thead>
           <tbody>{sorted.map((t, i) => (
             <tr key={t.id} className={`border-b last:border-0 ${i < 8 ? "bg-secondary/60" : ""} ${i === 7 && sorted.length > 8 ? "border-b-2 border-b-primary" : ""}`}>
               <td className="p-2 font-medium">{i + 1}</td>
@@ -125,6 +137,7 @@ function Index() {
               <td className="p-2">{t.robotCode}</td><td className="p-2">{t.bestTime.toFixed(2)}s</td>
               <td className="p-2">{t.penalty ? "Oui" : "Non"}</td><td className="p-2 font-semibold">{t.finalTime.toFixed(2)}s</td>
               <td className="p-2 font-semibold text-primary">{i < 8 ? "✓" : ""}</td><td className="p-2 text-muted-foreground">{t.remarks}</td>
+              <td className="p-2">{t.signature ? <img src={t.signature} alt={`Signature ${t.teamName}`} className="h-8 w-20 rounded border bg-card object-contain" /> : <span className="text-muted-foreground">—</span>}</td>
             </tr>))}
           </tbody></table></div>
       </section>
