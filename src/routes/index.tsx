@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { bestTimeOf, finalTimeOf, rank, type Team } from "@/lib/scoring";
+import { bestTimeOf, finalTimeOf, normalizeTime, rank, type Team } from "@/lib/scoring";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -31,7 +31,7 @@ function Index() {
     const times = [f.t1, f.t2, f.t3];
     const bestTime = bestTimeOf(times);
     save([...teams, { id: crypto.randomUUID(), teamName: f.teamName, teamLeader: f.teamLeader, robotCode: f.robotCode,
-      times: times.map((x) => Number(x) || 180), bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks }]);
+      times: times.map(normalizeTime), bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks }]);
     setF(empty); setStep(1);
   };
   const sorted = rank(teams);
