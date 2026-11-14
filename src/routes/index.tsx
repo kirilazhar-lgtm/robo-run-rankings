@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Bot, MessageSquare, Timer, User, Users } from "lucide-react";
 import { bestTimeOf, finalTimeOf, normalizeTime, rank, type Team } from "@/lib/scoring";
 
 export const Route = createFileRoute("/")({
@@ -18,6 +19,15 @@ const empty = { teamName: "", teamLeader: "", robotCode: "", t1: "", t2: "", t3:
 const input = "w-full rounded-lg border border-input bg-background px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-ring";
 const btn = "flex-1 rounded-lg bg-primary px-4 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50";
 const btn2 = "flex-1 rounded-lg border border-input px-4 py-3 text-base hover:bg-accent";
+
+function Field({ icon, top, children }: { icon: ReactNode; top?: boolean; children: ReactNode }) {
+  return (
+    <div className="relative">
+      <span className={`pointer-events-none absolute left-3 text-muted-foreground ${top ? "top-3.5" : "top-1/2 -translate-y-1/2"}`}>{icon}</span>
+      {children}
+    </div>
+  );
+}
 
 function Index() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -57,20 +67,20 @@ function Index() {
             </li>))}
         </ol>
         {step === 1 && <div className="space-y-3">
-          <input className={input} placeholder="Team name" value={f.teamName} onChange={set("teamName")} />
-          <input className={input} placeholder="Team leader" value={f.teamLeader} onChange={set("teamLeader")} />
-          <input className={input} placeholder="Robot code" value={f.robotCode} onChange={set("robotCode")} />
+          <Field icon={<Users size={18} />}><input className={`${input} pl-10`} placeholder="Team name" value={f.teamName} onChange={set("teamName")} /></Field>
+          <Field icon={<User size={18} />}><input className={`${input} pl-10`} placeholder="Team leader" value={f.teamLeader} onChange={set("teamLeader")} /></Field>
+          <Field icon={<Bot size={18} />}><input className={`${input} pl-10`} placeholder="Robot code" value={f.robotCode} onChange={set("robotCode")} /></Field>
           <div className="flex"><button className={btn} disabled={!f.teamName.trim()} onClick={() => setStep(2)}>Suivant</button></div>
         </div>}
         {step === 2 && <div className="space-y-3">
           {(["t1","t2","t3"] as const).map((k, i) => (
             <label key={k} className="block text-sm font-medium">{["First","Second","Third"][i]} time (s)
-              <input type="number" inputMode="decimal" step="0.01" min="0" className={`${input} mt-1`} placeholder="vide = 180" value={f[k]} onChange={set(k)} /></label>))}
+              <div className="mt-1"><Field icon={<Timer size={18} />}><input type="number" inputMode="decimal" step="0.01" min="0" className={`${input} pl-10`} placeholder="vide = 180" value={f[k]} onChange={set(k)} /></Field></div></label>))}
           <div className="flex gap-2"><button className={btn2} onClick={() => setStep(1)}>Retour</button><button className={btn} onClick={() => setStep(3)}>Suivant</button></div>
         </div>}
         {step === 3 && <div className="space-y-3">
           <label className="flex items-center gap-3 rounded-lg border border-input p-3 text-base"><input type="checkbox" className="h-5 w-5" checked={f.penalty} onChange={set("penalty")} /> Penalty 20%</label>
-          <textarea className={input} rows={3} placeholder="Remarks" value={f.remarks} onChange={set("remarks")} />
+          <Field top icon={<MessageSquare size={18} />}><textarea className={`${input} pl-10`} rows={3} placeholder="Remarks" value={f.remarks} onChange={set("remarks")} /></Field>
           <div className="grid grid-cols-2 gap-2 text-center">
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Best</p><p className="font-semibold">{bestTimeOf([f.t1,f.t2,f.t3]).toFixed(2)}s</p></div>
             <div className="rounded-lg bg-muted p-2"><p className="text-xs text-muted-foreground">Final</p><p className="font-semibold">{finalTimeOf(bestTimeOf([f.t1,f.t2,f.t3]), f.penalty).toFixed(2)}s</p></div>
