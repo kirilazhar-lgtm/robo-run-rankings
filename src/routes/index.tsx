@@ -70,18 +70,18 @@ function Index() {
       </section>
       <section className="rounded-lg border bg-card p-5 shadow-sm">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Classement</h2>
+          <div><h2 className="text-lg font-semibold">Classement</h2><p className="text-xs text-muted-foreground">Lignes surlignées = Top 8</p></div>
           <div className="flex gap-2"><button className={btn} onClick={exportCsv} disabled={!teams.length}>Exporter CSV</button><button className={btn2} onClick={reset}>Réinitialiser</button></div>
         </div>
         <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead><tr className="border-b text-left">{["Rank","Team Name","Robot Code","Best Time","Penalty","Final Time","Top 8","Remarks"].map((h) => <th key={h} className="p-2">{h}</th>)}</tr></thead>
           <tbody>{sorted.map((t, i) => (
-            <tr key={t.id} className="border-b last:border-0">
-              <td className="p-2 font-medium">{i + 1}</td>
-              <td className="p-2">{t.teamName} {i === 0 && <span className="ml-1 rounded bg-secondary px-2 py-0.5 text-xs">🏆 Gagnant</span>}</td>
+            <tr key={t.id} className={`border-b last:border-0 ${i < 8 ? "bg-secondary/60" : ""} ${i === 7 && sorted.length > 8 ? "border-b-2 border-b-primary" : ""}`}>
+              <td className="p-2 font-medium whitespace-nowrap">{i + 1}{i < 8 && <span className="ml-1 text-xs text-primary">✓</span>}</td>
+              <td className="p-2">{t.teamName} {i === 0 && <span className="ml-1 whitespace-nowrap rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground">🏆 Gagnant</span>}</td>
               <td className="p-2">{t.robotCode}</td><td className="p-2">{t.bestTime.toFixed(2)}s</td>
               <td className="p-2">{t.penalty ? "Oui" : "Non"}</td><td className="p-2 font-semibold">{t.finalTime.toFixed(2)}s</td>
-              <td className="p-2">{i < 8 ? "✓" : ""}</td><td className="p-2 text-muted-foreground">{t.remarks}</td>
+              <td className="p-2 font-semibold text-primary">{i < 8 ? "✓" : ""}</td><td className="p-2 text-muted-foreground">{t.remarks}</td>
             </tr>))}
             {!teams.length && <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">Aucune équipe enregistrée.</td></tr>}
           </tbody></table></div>
