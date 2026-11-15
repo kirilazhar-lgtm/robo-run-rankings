@@ -11,3 +11,8 @@ export const formatTimeInput = (raw: string) => {
   const sec = s.slice(0, 3);
   return rest.length ? `${sec}.${rest.join("").slice(0, 2)}` : sec;
 };
+/** Complète à 2 décimales à la sortie du champ : "80.6" → "80.60", "80" → "80.00". */
+export const padTime = (v: string) => {
+  const n = Number(v);
+  return v.trim() && !isNaN(n) && n > 0 ? n.toFixed(2) : v;
+};
