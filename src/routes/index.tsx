@@ -31,6 +31,23 @@ function T({ v }: { v: number }) {
   );
 }
 
+function TimeInput({ value, onChange, onBlur }: { value: string; onChange: (v: string) => void; onBlur: (v: string) => void }) {
+  const [s, d] = value.includes(".") ? value.split(".") : [value, null];
+  return (
+    <div className="relative">
+      <input type="text" inputMode="numeric" className={`${input} pl-10 font-digital tracking-wider text-transparent caret-foreground placeholder:font-sans placeholder:tracking-normal`} placeholder="ex. 90.50 (vide = 180)" value={value} onChange={(e) => onChange(formatTimeInput(e.target.value))} onBlur={(e) => onBlur(padTime(e.target.value))} />
+      {value && (
+        <span className="pointer-events-none absolute inset-y-0 left-10 flex items-center">
+          <span className="flex items-baseline font-digital tracking-wider text-foreground">
+            <span className="text-lg font-bold leading-none">{s}</span>
+            {d !== null && <span className="text-sm leading-none">,{d}</span>}
+          </span>
+        </span>
+      )}
+    </div>
+  );
+}
+
 function Field({ icon, top, children }: { icon: ReactNode; top?: boolean; children: ReactNode }) {
   return (
     <div className="relative">
@@ -89,7 +106,7 @@ function Index() {
         {step === 2 && <div className="space-y-3">
           {(["t1","t2","t3"] as const).map((k, i) => (
             <label key={k} className="block text-sm font-medium">{["First","Second","Third"][i]} time (s)
-              <div className="mt-1"><Field icon={<Timer size={18} />}><input type="text" inputMode="numeric" className={`${input} pl-10`} placeholder="ex. 90.50 (vide = 180)" value={f[k]} onChange={(e) => setF({ ...f, [k]: formatTimeInput(e.target.value) })} onBlur={(e) => setF({ ...f, [k]: padTime(e.target.value) })} /></Field></div></label>))}
+              <div className="mt-1"><Field icon={<Timer size={18} />}><TimeInput value={f[k]} onChange={(v) => setF({ ...f, [k]: v })} onBlur={(v) => setF({ ...f, [k]: v })} /></Field></div></label>))}
           <div className="flex gap-2"><button className={btn2} onClick={() => setStep(1)}>Retour</button><button className={btn} onClick={() => setStep(3)}>Suivant</button></div>
         </div>}
         {step === 3 && <div className="space-y-3">
