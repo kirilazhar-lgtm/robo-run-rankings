@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SignaturePad, type SignaturePadHandle } from "@/components/SignaturePad";
 import { Bot, Eraser, MessageSquare, Timer, User, Users } from "lucide-react";
-import { bestTimeOf, finalTimeOf, normalizeTime, rank, type Team } from "@/lib/scoring";
+import { bestTimeOf, finalTimeOf, formatTimeInput, normalizeTime, rank, type Team } from "@/lib/scoring";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -79,7 +79,7 @@ function Index() {
         {step === 2 && <div className="space-y-3">
           {(["t1","t2","t3"] as const).map((k, i) => (
             <label key={k} className="block text-sm font-medium">{["First","Second","Third"][i]} time (s)
-              <div className="mt-1"><Field icon={<Timer size={18} />}><input type="number" inputMode="decimal" step="0.01" min="0" className={`${input} pl-10`} placeholder="vide = 180" value={f[k]} onChange={set(k)} /></Field></div></label>))}
+              <div className="mt-1"><Field icon={<Timer size={18} />}><input type="text" inputMode="numeric" className={`${input} pl-10`} placeholder="ex. 90.50 (vide = 180)" value={f[k]} onChange={(e) => setF({ ...f, [k]: formatTimeInput(e.target.value) })} /></Field></div></label>))}
           <div className="flex gap-2"><button className={btn2} onClick={() => setStep(1)}>Retour</button><button className={btn} onClick={() => setStep(3)}>Suivant</button></div>
         </div>}
         {step === 3 && <div className="space-y-3">
