@@ -4,10 +4,10 @@ export const normalizeTime = (v: string | number) => { const n = Number(v); retu
 export const bestTimeOf = (t: (string | number)[]) => Math.min(...t.map(normalizeTime));
 export const finalTimeOf = (best: number, penalty: boolean) => (penalty ? best * 1.2 : best);
 export const rank = (teams: Team[]) => [...teams].sort((a, b) => a.finalTime - b.finalTime);
-/** Formate une saisie en secondes.centisecondes : les chiffres tapés glissent vers la gauche ("12345" → "123.45"). */
+/** Nettoie une saisie de temps en secondes : chiffres et un seul point, 2 décimales max ("40.2" reste "40.2"). */
 export const formatTimeInput = (raw: string) => {
-  const digits = raw.replace(/\D/g, "").replace(/^0+/, "").slice(0, 5);
-  if (!digits) return "";
-  const padded = digits.padStart(3, "0");
-  return `${Number(padded.slice(0, -2))}.${padded.slice(-2)}`;
+  const clean = raw.replace(",", ".").replace(/[^\d.]/g, "");
+  const [s = "", ...rest] = clean.split(".");
+  const sec = s.slice(0, 3);
+  return rest.length ? `${sec}.${rest.join("").slice(0, 2)}` : sec;
 };
