@@ -21,6 +21,11 @@ const input = "w-full rounded-lg border border-input bg-background px-4 py-3 tex
 const btn = "flex-1 rounded-lg bg-primary px-4 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50";
 const btn2 = "flex-1 rounded-lg border border-input px-4 py-3 text-base hover:bg-accent";
 
+function T({ v }: { v: number }) {
+  const [s, d] = v.toFixed(2).split(".");
+  return <><span className="font-bold">{s}</span>.{d}s</>;
+}
+
 function Field({ icon, top, children }: { icon: ReactNode; top?: boolean; children: ReactNode }) {
   return (
     <div className="relative">
@@ -116,13 +121,13 @@ function Index() {
                   <p className="text-xs text-muted-foreground">{t.robotCode || "—"}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="text-lg font-bold">{t.finalTime.toFixed(2)}s</p>
+                  <p className="text-lg"><T v={t.finalTime} /></p>
                   {i === 0 && <span className="whitespace-nowrap rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground">🏆 Gagnant</span>}
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                <span>T1 : {t.times[0].toFixed(2)}s</span><span>T2 : {t.times[1].toFixed(2)}s</span><span>T3 : {t.times[2].toFixed(2)}s</span>
-                <span>Best : {t.bestTime.toFixed(2)}s</span><span>Pénalité : {t.penalty ? "Oui" : "Non"}</span>
+                <span>T1 : <T v={t.times[0]} /></span><span>T2 : <T v={t.times[1]} /></span><span>T3 : <T v={t.times[2]} /></span>
+                <span>Best : <T v={t.bestTime} /></span><span>Pénalité : {t.penalty ? "Oui" : "Non"}</span>
                 {i < 8 && <span className="font-semibold text-primary">✓ Top 8</span>}
               </div>
               {t.remarks && <p className="mt-1 text-xs italic text-muted-foreground">{t.remarks}</p>}
@@ -136,9 +141,9 @@ function Index() {
               <td className="p-2 font-medium">{i + 1}</td>
               <td className="p-2">{t.teamName} {i === 0 && <span className="ml-1 whitespace-nowrap rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground">🏆 Gagnant</span>}</td>
               <td className="p-2">{t.robotCode}</td>
-              <td className="p-2">{t.times[0].toFixed(2)}s</td><td className="p-2">{t.times[1].toFixed(2)}s</td><td className="p-2">{t.times[2].toFixed(2)}s</td>
-              <td className="p-2">{t.bestTime.toFixed(2)}s</td>
-              <td className="p-2">{t.penalty ? "Oui" : "Non"}</td><td className="p-2 font-semibold">{t.finalTime.toFixed(2)}s</td>
+              <td className="p-2"><T v={t.times[0]} /></td><td className="p-2"><T v={t.times[1]} /></td><td className="p-2"><T v={t.times[2]} /></td>
+              <td className="p-2"><T v={t.bestTime} /></td>
+              <td className="p-2">{t.penalty ? "Oui" : "Non"}</td><td className="p-2"><T v={t.finalTime} /></td>
               <td className="p-2 font-semibold text-primary">{i < 8 ? "✓" : ""}</td><td className="p-2 text-muted-foreground">{t.remarks}</td>
               <td className="p-2">{t.signature ? <img src={t.signature} alt={`Signature ${t.teamName}`} className="h-8 w-20 rounded border bg-card object-contain" /> : <span className="text-muted-foreground">—</span>}</td>
             </tr>))}
