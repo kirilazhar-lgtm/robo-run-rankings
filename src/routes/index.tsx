@@ -45,7 +45,7 @@ function Index() {
     const times = [f.t1, f.t2, f.t3];
     const bestTime = bestTimeOf(times);
     save([...teams, { id: crypto.randomUUID(), teamName: f.teamName, teamLeader: f.teamLeader, robotCode: f.robotCode,
-      times: times.map(normalizeTime), bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks, signature: pad.current?.toDataURL() }]);
+      times: [normalizeTime(f.t1), normalizeTime(f.t2), normalizeTime(f.t3)], bestTime, penalty: f.penalty, finalTime: finalTimeOf(bestTime, f.penalty), remarks: f.remarks, signature: pad.current?.toDataURL() }]);
     setF(empty); setStep(1);
   };
   const sorted = rank(teams);
