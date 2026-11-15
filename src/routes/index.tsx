@@ -26,7 +26,7 @@ function T({ v }: { v: number }) {
   return (
     <span className="inline-flex items-baseline gap-0.5 rounded bg-muted px-1.5 py-0.5 font-digital tracking-wider text-foreground">
       <span className="text-lg font-bold leading-none">{s}</span>
-      <span className="text-sm leading-none">″{d}</span>
+      <span className="text-sm leading-none">,{d}</span>
     </span>
   );
 }
