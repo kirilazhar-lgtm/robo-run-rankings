@@ -24,7 +24,7 @@ const btn2 = "flex-1 rounded-lg border border-input px-4 py-3 text-base hover:bg
 function T({ v }: { v: number }) {
   const [s, d] = v.toFixed(2).split(".");
   return (
-    <span className="inline-flex items-baseline gap-0.5 rounded bg-muted px-1.5 py-0.5 font-digital tracking-wider text-foreground">
+    <span className="inline-flex items-baseline rounded bg-muted px-1.5 py-0.5 font-digital tracking-wider text-foreground">
       <span className="text-lg font-bold leading-none">{s}</span>
       <span className="text-sm leading-none">,{d}</span>
     </span>
