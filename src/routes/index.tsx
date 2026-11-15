@@ -51,8 +51,8 @@ function Index() {
   const sorted = rank(teams);
   const exportCsv = () => {
     const esc = (v: any) => `"${String(v).replace(/"/g, '""')}"`;
-    const rows = [["Rank","Team Name","Team Leader","Robot Code","Best Time","Penalty","Final Time","Top 8","Remarks"],
-      ...sorted.map((t, i) => [i + 1, t.teamName, t.teamLeader, t.robotCode, t.bestTime.toFixed(2), t.penalty ? "Oui" : "Non", t.finalTime.toFixed(2), i < 8 ? "✓" : "", t.remarks])];
+    const rows = [["Rank","Team Name","Team Leader","Robot Code","First Time","Second Time","Third Time","Best Time","Penalty","Final Time","Top 8","Remarks"],
+      ...sorted.map((t, i) => [i + 1, t.teamName, t.teamLeader, t.robotCode, t.times[0].toFixed(2), t.times[1].toFixed(2), t.times[2].toFixed(2), t.bestTime.toFixed(2), t.penalty ? "Oui" : "Non", t.finalTime.toFixed(2), i < 8 ? "✓" : "", t.remarks])];
     const blob = new Blob(["\uFEFF" + rows.map((r) => r.map(esc).join(";")).join("\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "classement.csv"; a.click();
   };
@@ -121,6 +121,7 @@ function Index() {
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span>T1 : {t.times[0].toFixed(2)}s</span><span>T2 : {t.times[1].toFixed(2)}s</span><span>T3 : {t.times[2].toFixed(2)}s</span>
                 <span>Best : {t.bestTime.toFixed(2)}s</span><span>Pénalité : {t.penalty ? "Oui" : "Non"}</span>
                 {i < 8 && <span className="font-semibold text-primary">✓ Top 8</span>}
               </div>
@@ -129,12 +130,14 @@ function Index() {
             </li>))}
         </ul>
         <div className="hidden overflow-x-auto md:block"><table className="w-full text-sm">
-          <thead><tr className="border-b text-left">{["Rank","Team Name","Robot Code","Best Time","Penalty","Final Time","Top 8","Remarks","Signature"].map((h) => <th key={h} className="p-2">{h}</th>)}</tr></thead>
+          <thead><tr className="border-b text-left">{["Rank","Team Name","Robot Code","First Time","Second Time","Third Time","Best Time","Penalty","Final Time","Top 8","Remarks","Signature"].map((h) => <th key={h} className="p-2">{h}</th>)}</tr></thead>
           <tbody>{sorted.map((t, i) => (
             <tr key={t.id} className={`border-b last:border-0 ${i < 8 ? "bg-secondary/60" : ""} ${i === 7 && sorted.length > 8 ? "border-b-2 border-b-primary" : ""}`}>
               <td className="p-2 font-medium">{i + 1}</td>
               <td className="p-2">{t.teamName} {i === 0 && <span className="ml-1 whitespace-nowrap rounded bg-primary px-2 py-0.5 text-xs text-primary-foreground">🏆 Gagnant</span>}</td>
-              <td className="p-2">{t.robotCode}</td><td className="p-2">{t.bestTime.toFixed(2)}s</td>
+              <td className="p-2">{t.robotCode}</td>
+              <td className="p-2">{t.times[0].toFixed(2)}s</td><td className="p-2">{t.times[1].toFixed(2)}s</td><td className="p-2">{t.times[2].toFixed(2)}s</td>
+              <td className="p-2">{t.bestTime.toFixed(2)}s</td>
               <td className="p-2">{t.penalty ? "Oui" : "Non"}</td><td className="p-2 font-semibold">{t.finalTime.toFixed(2)}s</td>
               <td className="p-2 font-semibold text-primary">{i < 8 ? "✓" : ""}</td><td className="p-2 text-muted-foreground">{t.remarks}</td>
               <td className="p-2">{t.signature ? <img src={t.signature} alt={`Signature ${t.teamName}`} className="h-8 w-20 rounded border bg-card object-contain" /> : <span className="text-muted-foreground">—</span>}</td>
